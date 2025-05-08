@@ -8,7 +8,7 @@ const validateAuthFields = (data) => {
 
     if(!isAllowed)
     {
-        throw new Error("Field Missing❌");
+        throw new Error("Field Missing");
     }
     if(!validator.isEmail(data.emailId))
     {

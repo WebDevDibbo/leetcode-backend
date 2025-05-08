@@ -8,20 +8,24 @@ const problemSchema = new Schema({
         type:String,
         required:true,
     },
+    
     description:{
         type : String,
         required:true,
     },
+
     difficulty:{
         type:String,
         enum : ['Easy','Medium','Hard'],
         required : true,
     },
+
     topics:{
         type : String,
         enum : ['array','linkedlist','graph','dp'],
         required : true,
     },
+
     visibleTestCases:[
         {
             input : {
@@ -38,6 +42,7 @@ const problemSchema = new Schema({
             },
         }
     ],
+
     hiddenTestCases:[
         {
             input : {
@@ -50,6 +55,7 @@ const problemSchema = new Schema({
             },
         }
     ],
+
     starterCode:[
         {
             language : {
@@ -62,6 +68,21 @@ const problemSchema = new Schema({
             },
         }
     ],
+
+    referenceSolution : [
+        {
+            language : {
+                type : String,
+                required : true,
+            },
+            completeCode : {
+                type : String,
+                required : true,
+            }
+        }
+
+    ],
+
     problemCreator:{
         type : Schema.Types.ObjectId,
         ref : "user",

@@ -40,7 +40,6 @@ const validateAdmin = async (req, res, next)=> {
 
         
         req.result = result;
-        console.log(req)
         next();
 
     }
