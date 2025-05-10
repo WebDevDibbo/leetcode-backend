@@ -48,7 +48,7 @@ const submitToken = async (resultToken) => {
       fields: "*",
     },
     headers: {
-      "x-rapidapi-key": "c02404b052mshf1c75d2d7f61e7ep1aa913jsnebdad3961847",
+      "x-rapidapi-key": "lajfei2424872894hkjahdfsa4rq343",
       "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
     },
   };
@@ -89,3 +89,6 @@ const waiting = async (time) => {
 }
 
 module.exports = { getLanguageById, submitBatch, submitToken };
+
+
+// c02404b052mshf1c75d2d7f61e7ep1aa913jsnebdad3961847
