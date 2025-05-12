@@ -16,7 +16,7 @@ const problemSchema = new Schema({
 
     difficulty:{
         type:String,
-        enum : ['Easy','Medium','Hard'],
+        enum : ['easy','medium','hard'],
         required : true,
     },
 
@@ -62,7 +62,7 @@ const problemSchema = new Schema({
                 type : String,
                 required : true,
             },
-            code : {
+            initialCode : {
                 type : String,
                 required : true,
             },

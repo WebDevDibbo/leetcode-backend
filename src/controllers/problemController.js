@@ -34,8 +34,11 @@ const createProblem = async(req,res) => {
             }))
             // i am sending this submissions to judge0 -- it will return a token 
             const submitResult = await submitBatch(submissions);
-
+            console.log('submitResult',submitResult);
+            
             const resultToken = submitResult.map(val => val.token);
+            console.log('resulttoken',resultToken);
+            
 
             const testResult =  await submitToken(resultToken);
 
@@ -75,7 +78,7 @@ const updateProblem = async(req,res) => {
         if(!id) {
             return res.status(400).send("Field ID Missing!")
         }
-        const DsaProblem = await findById(id);
+        const DsaProblem = await Problem.findById(id);
         if(!DsaProblem){
             return res.status(404).send("ID is not present in server");
         }
@@ -131,7 +134,7 @@ const deleteProblem = async(req,res) => {
             return res.status(400).send("Field ID Missing!")
         }
 
-        const deletedProblem = await findByIdAndDelete(id);
+        const deletedProblem = await Problem.findByIdAndDelete(id);
 
         if(!deletedProblem){
             return res.status(404).send("Problem is missing");
@@ -141,7 +144,8 @@ const deleteProblem = async(req,res) => {
 
     }
     catch(err) {
-        res.status()
+        res.status(404).send(`error : ${err.message}`);
+
     }
 }
 
@@ -155,7 +159,7 @@ const getProblemById = async(req,res)=>{
             return res.status(400).send("ID is missing");
         }
 
-        const getProblem = await Problem.findById(id);
+        const getProblem = await Problem.findById(id).select('-hiddenTestCases -problemCreator -createdAt -updatedAt -__v');
 
         if(!getProblem){
             return res.status(404).send("Problem is Missing");
@@ -169,12 +173,12 @@ const getProblemById = async(req,res)=>{
 }
 
 
-const getAllProblem = async(req,res) => {
+const getAllProblems = async(req,res) => {
 
 
     try{
 
-        const problems =  await Problem.find({});
+        const problems =  await Problem.find({}).select('_id title difficulty');
         if(problems.length === 0){
             return  res.status(404).send("Problems missing");
     }
@@ -189,4 +193,4 @@ const getAllProblem = async(req,res) => {
 
 // submit korar por seta store korte hobe kon user dara eta submit hoise??
 
-module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblem};
+module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblems};

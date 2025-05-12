@@ -3,8 +3,8 @@ const axios = require("axios");
 const getLanguageById = (lang) => {
   const language = {
     "c++": 54,
-    java: 62,
-    javascript: 63,
+    "java": 62,
+    "javascript": 63,
   };
 
   return language[lang.toLowerCase()];
@@ -15,7 +15,7 @@ const submitBatch = async (submissions) => {
     method: "POST",
     url: "https://judge0-ce.p.rapidapi.com/submissions/batch",
     params: {
-      base64_encoded: "true",
+      base64_encoded: "false",
     },
     headers: {
       "x-rapidapi-key": "c02404b052mshf1c75d2d7f61e7ep1aa913jsnebdad3961847",
@@ -44,11 +44,11 @@ const submitToken = async (resultToken) => {
     url: "https://judge0-ce.p.rapidapi.com/submissions/batch",
     params: {
       tokens: resultToken.join(","),
-      base64_encoded: "true",
+      base64_encoded: "false",
       fields: "*",
     },
     headers: {
-      "x-rapidapi-key": "lajfei2424872894hkjahdfsa4rq343",
+      "x-rapidapi-key": "c02404b052mshf1c75d2d7f61e7ep1aa913jsnebdad3961847",
       "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
     },
   };
@@ -68,6 +68,7 @@ const submitToken = async (resultToken) => {
     const result = await fetchData();
 
     // we have to check status_id if it is not 3 call again
+    console.log('result',result);
     const isResultObtained = result.submissions.every(key => key.status_id > 2);
   
     if(isResultObtained)
@@ -91,4 +92,3 @@ const waiting = async (time) => {
 module.exports = { getLanguageById, submitBatch, submitToken };
 
 
-// c02404b052mshf1c75d2d7f61e7ep1aa913jsnebdad3961847
