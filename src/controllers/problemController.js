@@ -1,6 +1,6 @@
 const {getLanguageById, submitBatch, submitToken} = require("../utils/problemUtility");
 const Problem = require("../models/problem");
-const { findById, findByIdAndDelete } = require("../models/user");
+const User = require('../models/user');
 
 const createProblem = async(req,res) => {
 
@@ -191,6 +191,19 @@ const getAllProblems = async(req,res) => {
 
 }
 
+
+const getSolvedProblemsByUser = async(req,res) => {
+
+    try{
+        
+        const count = req.result.problemSolved.length;
+        res.status(200).send(count);
+        
+    }catch(err){
+        res.status(500).send('Internal server error');
+    }
+}
+
 // submit korar por seta store korte hobe kon user dara eta submit hoise??
 
-module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblems};
+module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblems, getSolvedProblemsByUser};
