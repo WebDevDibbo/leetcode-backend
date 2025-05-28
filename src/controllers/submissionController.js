@@ -107,5 +107,8 @@ const submitCode = async(req,res) => {
    
 } 
 
+const runCode = async(req,res) => {
 
-module.exports = {submitCode};
+}
+
+module.exports = {submitCode,runCode};

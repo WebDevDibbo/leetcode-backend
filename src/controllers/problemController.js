@@ -1,6 +1,7 @@
 const {getLanguageById, submitBatch, submitToken} = require("../utils/problemUtility");
 const Problem = require("../models/problem");
 const User = require('../models/user');
+const Submission = require('../models/submission');
 
 const createProblem = async(req,res) => {
 
@@ -124,6 +125,7 @@ const updateProblem = async(req,res) => {
     }
 }
 
+
 const deleteProblem = async(req,res) => {
 
     const {id} = req.params;
@@ -148,6 +150,7 @@ const deleteProblem = async(req,res) => {
 
     }
 }
+
 
 const getProblemById = async(req,res)=>{
 
@@ -196,14 +199,42 @@ const getSolvedProblemsByUser = async(req,res) => {
 
     try{
         
-        const count = req.result.problemSolved.length;
-        res.status(200).send(count);
-        
+        const id = req.result._id;
+        const user = await User.findById(id).populate({
+            path : "problemSolved",
+            select : "_id title description topics"
+        });
+        // const count = req.result.problemSolved.length;
+        res.status(200).send(user.problemSolved);
+
     }catch(err){
         res.status(500).send('Internal server error');
     }
 }
 
 // submit korar por seta store korte hobe kon user dara eta submit hoise??
+const submittedProblem = async(req,res)=>{
 
-module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblems, getSolvedProblemsByUser};
+    try{
+
+        const userId = req.result._id;
+        const problemId = req.params.pid;
+
+        const ans = await Submission.find({userId,problemId});
+
+        if(ans.length === 0)
+        {
+            res.status(200).send("No Submission found");
+        }
+        res.status(200).send(ans);
+    }
+
+    catch(err)
+    {
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+
+
+module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblems, getSolvedProblemsByUser, submittedProblem};

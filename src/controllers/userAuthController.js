@@ -4,7 +4,6 @@ const validateAuthFields = require('../utils/authValidator');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-
 const registerUser = async(req,res) => {
 
     try{
@@ -15,13 +14,22 @@ const registerUser = async(req,res) => {
         req.body.password = await bcrypt.hash(pass, 10);
         req.body.role = "user";
         //email is already exist you dont have check that because you have already mention it in userSchema
-
-        const user = await User.create(req.body);
-
-        const token = jwt.sign({_id:user._id, role:user.role, emailId : user.emailId}, process.env.JWT_KEY, {expiresIn: 60*60});
         
+        const user = await User.create(req.body);
+        console.log('user',user);
+        const token = jwt.sign({_id:user._id, role:user.role, emailId : user.emailId}, process.env.JWT_KEY, {expiresIn: 60*60});
+
+        const userInfo = {
+            firstName : user.firstName,
+            emailId : user.emailId,
+            _id : user._id
+        }
+        // console.log('user',userInfo);
         res.cookie('token',token, {maxAge : 60*60*1000});
-        res.status(201).send("User Registered Successfully");
+        res.status(201).json({
+            user : userInfo,
+            message : "User Registered Successfully"
+        });
     }
     catch(err){
         res.status(400).send(`Error : ${err.message}`);
@@ -44,9 +52,18 @@ const loginUser = async(req,res)=> {
         if(!isMatch)
             throw new Error("Invalid Credentials");
 
+        const userInfo = {
+            firstName : user.firstName,
+            emailId : user.emailId,
+            _id : user._id
+        }
+
         const token = jwt.sign({_id:user._id, role: user.role, emailId : user.emailId}, process.env.JWT_KEY, {expiresIn: 60*60});
         res.cookie('token',token, {maxAge : 60*60*1000});
-        res.status(200).send("Logged In Successfully");
+        res.status(200).json({
+            user : userInfo,
+            message : "Login Successfully"
+        })
 
     }
     catch(err){
@@ -109,4 +126,38 @@ const adminRegister = async(req,res)=>{
 
 }
 
-module.exports = {registerUser, loginUser, logoutUser, adminRegister};
+const deleteProfile = async(req, res) => {
+
+    try{
+
+        const userId = req.result._id;
+        await User.findByIdAndDelete(userId);
+
+        // await Submission.deleteMany({userId});
+        res.status(200).send('profile deleted successfully');
+
+
+    }catch(err)
+    {
+        res.status(500).send('Internal server error'); 
+    }
+
+}
+
+const userData = (req,res) => {
+
+    const userInfo = {
+        firstName : req.result.firstName,
+        emailId : req.result.emailId,
+        _id : req.user?._id
+    }
+    res.status(200).json(
+        {
+            user : userInfo,
+            message : "Valid User"
+        }
+    )
+}
+
+
+module.exports = {registerUser, loginUser, logoutUser, adminRegister, deleteProfile, userData};

@@ -2,6 +2,7 @@ const validator = require('validator');
 
 const validateAuthFields = (data) => {
 
+    
     const mandatoryFields = ['firstName', 'emailId', 'password'];
     const dataField = Object.keys(data); // returns an array of keys from the data object
     const isAllowed = mandatoryFields.every((field) => dataField.includes(field));
