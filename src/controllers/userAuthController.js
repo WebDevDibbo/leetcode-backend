@@ -16,7 +16,7 @@ const registerUser = async(req,res) => {
         //email is already exist you dont have check that because you have already mention it in userSchema
         
         const user = await User.create(req.body);
-        console.log('user',user);
+        
         const token = jwt.sign({_id:user._id, role:user.role, emailId : user.emailId}, process.env.JWT_KEY, {expiresIn: 60*60});
 
         const userInfo = {
@@ -46,6 +46,7 @@ const loginUser = async(req,res)=> {
             throw new Error("Invalid Credentials");
 
         const user = await User.findOne({emailId});
+        if(!user) throw new Error("user not found");
 
         const isMatch = await bcrypt.compare(password, user.password);
 
@@ -55,7 +56,8 @@ const loginUser = async(req,res)=> {
         const userInfo = {
             firstName : user.firstName,
             emailId : user.emailId,
-            _id : user._id
+            _id : user._id,
+            role : user.role,
         }
 
         const token = jwt.sign({_id:user._id, role: user.role, emailId : user.emailId}, process.env.JWT_KEY, {expiresIn: 60*60});
@@ -71,13 +73,12 @@ const loginUser = async(req,res)=> {
     }
 }
 
-
 const logoutUser = async(req,res) => {
 
     try{
 
         //validate the token
-        console.log(req);
+        
         const {token} = req.cookies;
 
         const payload = jwt.decode(token);
@@ -96,7 +97,6 @@ const logoutUser = async(req,res) => {
         res.status(503).send(`Error : ${err.message}`);
     }
 }
-
 
 const adminRegister = async(req,res)=>{
 
@@ -149,7 +149,8 @@ const userData = (req,res) => {
     const userInfo = {
         firstName : req.result.firstName,
         emailId : req.result.emailId,
-        _id : req.user?._id
+        _id : req.result._id,
+        role : req.result.role,
     }
     res.status(200).json(
         {

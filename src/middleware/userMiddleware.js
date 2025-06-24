@@ -13,7 +13,7 @@ const validateUserToken = async(req, res, next) => {
 
         const payload = jwt.verify(token,process.env.JWT_KEY);
         const {_id} = payload;
-
+        
         if(!_id){
             throw new Error("Invalid Token");
         }
@@ -32,6 +32,7 @@ const validateUserToken = async(req, res, next) => {
             throw new Error("Invalid token");
         }
         req.result = result;
+        console.log('usermiddlw')
         next();
 
     }

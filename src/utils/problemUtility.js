@@ -11,6 +11,7 @@ const getLanguageById = (lang) => {
 };
 
 const submitBatch = async (submissions) => {
+  //* judge0 cant submit more than 20 submission ???
   const options = {
     method: "POST",
     url: "https://judge0-ce.p.rapidapi.com/submissions/batch",
@@ -18,7 +19,7 @@ const submitBatch = async (submissions) => {
       base64_encoded: "false",
     },
     headers: {
-      "x-rapidapi-key": "c02404b052mshf1c75d2d7f61e7ep1aa913jsnebdad3961847",
+      "x-rapidapi-key": process.env.JUDGE0_KEY,
       "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
       "Content-Type": "application/json",
     },
@@ -48,7 +49,7 @@ const submitToken = async (resultToken) => {
       fields: "*",
     },
     headers: {
-      "x-rapidapi-key": "c02404b052mshf1c75d2d7f61e7ep1aa913jsnebdad3961847",
+      "x-rapidapi-key": process.env.JUDGE0_KEY,
       "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
     },
   };
