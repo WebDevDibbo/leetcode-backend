@@ -10,6 +10,7 @@ const submitRouter = require('./routes/submission');
 const aiRouter = require('./routes/chatWithAi');
 const playlistRouter = require('./routes/playlist');
 const cors = require('cors');
+const videoRouter = require('./routes/videoCreator');
 
 
 app.use(cors({
@@ -20,12 +21,12 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-
 app.use('/api/users', authRouter);
 app.use('/api/problems', problemRouter);
 app.use('/api/submission', submitRouter);
 app.use('/api/playlists', playlistRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/video', videoRouter);
 
 
 

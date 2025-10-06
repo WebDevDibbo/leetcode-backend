@@ -69,6 +69,7 @@ const loginUser = async(req,res)=> {
 
     }
     catch(err){
+        console.log('er',err,err.message)
         res.status(401).send(`Error : ${err.message}`);
     }
 }

@@ -93,7 +93,7 @@ const submitCode = async(req,res) => {
 
         // we will insert problemid into userSchema problemSolved field if it is not present there
 
-        if(!req.result.problemSolved.includes(problemId))
+        if(!req.result.problemSolved.includes(problemId) && submitedResult.status === 'accepted')
         {
             req.result.problemSolved.push(problemId);
             await req.result.save(); 

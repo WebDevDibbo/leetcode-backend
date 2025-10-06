@@ -83,11 +83,29 @@ const problemSchema = new Schema({
 
     ],
 
+    likes : [{
+        type : Schema.Types.ObjectId,
+        ref : 'user'
+    }],
+
+    notes : [{
+        user : {
+            type : Schema.Types.ObjectId,
+            ref : 'user',
+            required : true
+        },
+        text : {
+            type : String,
+            required : true
+        }
+    }],
+
     problemCreator:{
         type : Schema.Types.ObjectId,
         ref : "user",
         required : true,
     }
+    
 },{timestamps:true})
 
 const Problem = new mongoose.model('problem',problemSchema);

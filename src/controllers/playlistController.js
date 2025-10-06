@@ -7,28 +7,25 @@ const createPlaylist = async (req,res)  => {
     try{
 
     const user_id= req.result._id;
-    const {title,problemId} = req.body;
+    const {title} = req.body;
+    const problemId = req.body.problemId;
    
-    
     if(!user_id || !title || !problemId)
         return res.status(400).send('something missing');
-
-    const problem = await Problem.findById(problemId);
-
-    if(!problem)
-        return res.status(400).send('problem not found');
-
-    // if(typeof problem === 'string') problemId = [problemId];
-
 
     const playlistResult = await Playlist.create({
         title,
         userId : user_id,
-        problems: problemId,
+        problems: [],
     })
 
-    await playlistResult.save();
-    res.status(201).send("playlist created Successfully");
+    if(!playlistResult.problems.includes(problemId))
+    {
+        playlistResult.problems.push(problemId);
+        await playlistResult.save();
+    }
+
+    res.status(201).send("Playlist Created and Problem Added Successfully");
 
     }
     catch(err){
@@ -49,7 +46,7 @@ const addProblemToPlaylist = async(req,res) => {
             return res.status(400).send('some field is missing');
 
 
-        const existingPlaylist = await Playlist.findById(playlistId);
+        const existingPlaylist = await Playlist.findOne({_id:playlistId,userId});
 
         if(!existingPlaylist)
             return res.status(404).send('playlist not found');
@@ -63,10 +60,10 @@ const addProblemToPlaylist = async(req,res) => {
             existingPlaylist.problems.push(problemId);
             await existingPlaylist.save();
         }
-        res.status(201).json("problem added Successfully");
+        res.status(201).json("Problem Added Successfully");
    }
    catch(err){
-     res.status(500).json("failed to added");
+     res.status(500).json("Failed to Added");
    }
 
 
@@ -81,8 +78,10 @@ const getUserPlaylists = async(req,res)  => {
         const userId = req.result._id;
 
         if(!userId) return res.status(400).send('User not found');
+
         const playlists = await Playlist.find({userId});
-        // console.log('playlist',playlists);
+        console.log('playlist',playlists);
+
         res.status(200).json(playlists);
 
     }
@@ -103,8 +102,10 @@ const getPlaylistById = async(req,res) => {
             return res.status(400).send("Field ID Missing!");
         }
 
-        const playlist =await Playlist.findOne({_id : id, userId : req.result._id}).populate('problems');
+        const playlist = await Playlist.findOne({_id : id, userId : req.result._id}).populate('problems');
+
         if(!playlist) return res.status(404).json({error :  "playlist not found"});
+
         res.status(200).json(playlist);
     }
     catch(err) {
@@ -150,7 +151,13 @@ const deletePlaylistProblem = async(req,res) => {
     
         const getProblemPlaylist = await Playlist.findOne({_id : playlistId, userId});
         if(!getProblemPlaylist) return res.status(404).json({error : "playlist not found"});
-    
+
+        const problemexist = getProblemPlaylist.problems.some(pbId => pbId.toString() === problemId);
+        
+        if(!problemexist)
+        {
+               return res.status(404).json({ error: "Problem not found in playlist" });
+        }
         getProblemPlaylist.problems = getProblemPlaylist.problems.filter(pbId => pbId.toString() !== problemId);
         await getProblemPlaylist.save();
 

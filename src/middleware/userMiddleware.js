@@ -32,7 +32,7 @@ const validateUserToken = async(req, res, next) => {
             throw new Error("Invalid token");
         }
         req.result = result;
-        console.log('usermiddlw')
+        
         next();
 
     }

@@ -2,7 +2,7 @@ const {getLanguageById, submitBatch, submitToken} = require("../utils/problemUti
 const Problem = require("../models/problem");
 const User = require('../models/user');
 const Submission = require('../models/submission');
-
+const SolutionVideo = require('../models/solutionVideo');
 
 const createProblem = async(req,res) => {
 
@@ -160,7 +160,7 @@ const deleteProblem = async(req,res) => {
 const getProblemById = async(req,res)=>{
 
     const {id} = req.params;
-    
+    const userId = req.result._id;
 
     try{
         
@@ -169,11 +169,30 @@ const getProblemById = async(req,res)=>{
         }
 
         const getProblem = await Problem.findById(id).select('-hiddenTestCases -problemCreator -createdAt -updatedAt -__v');
+        
+        
 
         if(!getProblem){
             return res.status(404).send("Problem is Missing");
         }
 
+
+        // get the video url 
+        const video = await SolutionVideo.findOne({problemId : id})
+        
+        if(video)
+        {
+            const responseData = {
+                ...getProblem.toObject(),
+                secureUrl : video.videoSecureUrl,
+                duration : video.duration,
+                thumbnailUrl : video.thumbnailSecureUrl,
+                cloud_name : process.env.CLOUDINARY_CLOUD_NAME,
+                public_id : video.videoPublicId
+            }
+            
+            return res.status(200).send(responseData);
+        }
         res.status(200).send(getProblem);
     }
     catch(err){
@@ -204,15 +223,25 @@ const getAllProblems = async(req,res) => {
 const getSolvedProblemsByUser = async(req,res) => {
 
     try{
-         console.log('problemsoved',req.result);
+        //  console.log('problemsoved',req.result);
         const id = req.result._id;
-        const user = await User.findById(id).populate({
-            path : "problemSolved",
-            select : "_id title description topics"
-        });
-        const sub = await Submission.find();
-        // console.log('problemSolvedbaku --> ',req.result.problemSolved);
-        // const count = req.result.problemSolved.length;
+
+        // const user = await User.findById(id).populate({
+        //     path : "problemSolved",
+        //     select : "_id title description topics"
+        // });
+        const user = await User.findById(id).populate({path : "problemSolved"});
+        // console.log('problemsolved -->', user);
+        // const sub = await Submission.find({userId : id, });
+        const sub = await Submission.find({userId : id, });
+        let ps = [];
+        sub.forEach(s => {
+            // console.log(s);
+            if(!ps.includes(s.problemId)) ps.push(s.problemId);
+        })
+        // console.log('problems',problems);
+        // console.log('sub',sub);
+        // console.log('user',user);
         res.status(200).send(user.problemSolved);
 
     }catch(err){
@@ -245,5 +274,61 @@ const submittedProblem = async(req,res)=>{
 }
 
 
+const likeProblem = async(req,res) => {
 
-module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblems, getSolvedProblemsByUser, submittedProblem};
+    const {id} = req.params;
+    const userId = req.result._id;
+
+    try{
+
+        if(!id) 
+            return res.status(400).send("Field ID Missing!");
+
+        const update = await Problem.findByIdAndUpdate(id, 
+            { $addToSet : {likes : userId} },
+            {new: true}, 
+            {runValidators: true} 
+        )
+
+        if (!update) return res.status(404).json({ error: "Problem not found" });
+
+        res.status(200).json({ message: "Liked", likes: update.likes.length });
+
+
+    }
+    catch(err)
+    {
+        res.status(500).json({error : err.message});
+    }
+}
+
+const removeLikedProblem = async (req,res) => {
+
+    const {id} = req.params;
+    const userId = req.result._id;
+
+
+    try{
+
+        if(!id) 
+            return res.status(400).send("Field ID Missing!");
+
+        const update = await Problem.findByIdAndUpdate(id, 
+            {$pull : {likes : userId}},
+            {new: true}, 
+            {runValidators: true }
+        )
+
+        if (!update) return res.status(404).json({ error: "Problem not found" });
+
+        res.status(200).json({ message: "removeLiked", likes: update.likes.length });
+
+    }
+    catch(err)
+    {
+        res.status(500).json({error : err.message});
+    }
+}
+
+
+module.exports = {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblems, getSolvedProblemsByUser, submittedProblem, likeProblem, removeLikedProblem};
